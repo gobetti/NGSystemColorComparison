@@ -15,23 +15,40 @@ extension Color {
 }
 
 struct ContentView : View {
-    let colors: [SystemColor]
-    var body: some View {
-        List(colors, id: \.name) { color in
-            HStack {
-                Color(uiColor: color.color)
-                    .frame(width: 30, height: 30)
+    @Environment(\.colorScheme) var colorScheme // will reload this view on colorScheme changes
+    @State private var isShowingModal = false
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(color.name)
-                    HStack {
-                        Text(color.hexDescription)
-                            .font(.subheadline)
+    let colors: [SystemColor]
+    var isModal = false
+
+    var body: some View {
+        NavigationView {
+            List(colors, id: \.name) { color in
+                HStack {
+                    Color(uiColor: color.color)
+                        .frame(width: 30, height: 30)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(color.name)
+                        HStack {
+                            Text(color.hexDescription)
+                                .font(.subheadline)
+                        }
                     }
                 }
             }
+            .navigationBarItems(trailing: HStack {
+                if !self.isModal {
+                    Button("Modal") {
+                        self.isShowingModal.toggle()
+                    }
+                }
+            })
         }
+        .sheet(isPresented: self.$isShowingModal, content: { ContentView(colors: self.colors, isModal: true) })
     }
+
+
 }
 
 #if DEBUG
